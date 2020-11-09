@@ -12,6 +12,8 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Region;
 import android.net.Uri;
 import android.os.Build;
@@ -32,6 +34,7 @@ import com.cloudmersive.client.model.GenderDetectionResult;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -93,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //WE WE METTI QUA RPOBE DA FARE IL  PERMESSO RUNTIME, ALTRIMENTI CANCELLALO CON LE DIPENDENZE
-        String[] PERMISSIONS = {};
+        String[] PERMISSIONS = {Manifest.permission.INTERNET};
         checkPermission(PERMISSIONS);
 
         setContentView(R.layout.activity_main);
@@ -137,12 +140,26 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE){
             //Uri uri = data.getData();
+
+
+            File imageFile = new File(FilePath.getPath(getApplicationContext(), imageUri));
+            Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+            double m = (double)bitmap.getHeight() / bitmap.getWidth();
+            Bitmap bitmapRes = Bitmap.createScaledBitmap(bitmap, (int)Math.sqrt(787000 / m), (int)Math.sqrt(787000 * m), true);
+            try {
+                FileOutputStream outputStream = new FileOutputStream(imageFile);
+                bitmapRes.compress(Bitmap.CompressFormat.JPEG,100, outputStream); // this line will reduce the size , try changing the second argument to adjust to correct size , it ranges 0-100
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             imageView1.setImageURI(imageUri);
-            apiemela(imageUri);
+            System.out.println(imageFile.length());
+            apiemela(imageFile);
         }
     }
 
-    private void apiemela(Uri uriFile){
+    private void apiemela(File imageFile){
         //String dd = FilePath.getPath(getApplicationContext(), uriFile);
         Thread thread = new Thread(){
             public void run(){
@@ -152,12 +169,15 @@ public class MainActivity extends AppCompatActivity {
                 Apikey.setApiKey(ApiKey.ApiKey);
 
                 FaceApi apiInstance = new FaceApi();
-                File imageFile = new File(FilePath.getPath(getApplicationContext(), uriFile)); // File | Image file to perform the operation on.  Common file formats such as PNG, JPEG are supported.
                 try {
                     //https://api.cloudmersive.com/swagger/index.html?urls.primaryName=Image%20Recognition%20and%20Processing%20API
-                    //AgeDetectionResult result = apiInstance.faceDetectAge(imageFile);
-                    GenderDetectionResult result = apiInstance.faceDetectGender(imageFile);
-                    System.out.println(result);
+                    AgeDetectionResult resultAge = apiInstance.faceDetectAge(imageFile);
+
+                    GenderDetectionResult resultGender = apiInstance.faceDetectGender(imageFile);
+                    resultAge.getPeopleWithAge()
+                    System.err.println("____________________________________");
+                    System.out.println(resultAge);
+                    System.out.println(resultGender);
                 } catch (ApiException e) {
                     System.err.println("____________________________________");
                     System.err.println(e.toString());
