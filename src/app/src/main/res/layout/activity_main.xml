@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Select image"
+            android:text="Take photo"
             app:icon="@drawable/ic_browser">
 
         </Button>
