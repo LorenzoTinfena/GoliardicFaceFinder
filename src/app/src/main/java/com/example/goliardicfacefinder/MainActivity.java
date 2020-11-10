@@ -176,22 +176,20 @@ public class MainActivity extends AppCompatActivity {
     protected void ApiResposeCallback(LinkedList<Face> res){
         if (res != null){
 
-Canvas canvas = new Canvas();
-            for (Face f : res){
-                Paint pai = new Paint();
-                pai.setColor(Color.argb(125, 0, 64, 255));
+            Paint pai = new Paint();
+            pai.setColor(Color.argb(125, 0, 64, 255));
 
-                BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
-                Bitmap bitmap = drawable.getBitmap();
-                Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
-                Canvas tempCanvas = new Canvas(tempBitmap);
-                tempCanvas.drawBitmap(bitmap, 0, 0, null);
+            BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
+            Canvas tempCanvas = new Canvas(tempBitmap);
+            tempCanvas.drawBitmap(bitmap, 0, 0, null);
+            for (Face f : res){
                 for (Rect re : GetBounds(f)){
                     tempCanvas.drawRect(re, pai);
                 }
-                imageView1.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
-
             }
+            imageView1.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
         }
         else{
 
@@ -244,11 +242,11 @@ Canvas canvas = new Canvas();
                     if (resultAge.isSuccessful()){
                         LinkedList<Face> res = new LinkedList<>();
                         for (int i = 0; i < resultAge.getPeopleIdentified(); i++){
-                            PersonWithAge p = resultAge.getPeopleWithAge().get(0);
+                            PersonWithAge p = resultAge.getPeopleWithAge().get(i);
                             com.cloudmersive.client.model.Face face = p.getFaceLocation();
                             res.add(new Face(face.getLeftX(), face.getTopY(), face.getRightX(), face.getBottomY(), p.getAgeClass(), p.getAge(), p.getAgeClassificationConfidence()));
-                            ApiResposeCallback(res);
                         }
+                        ApiResposeCallback(res);
                     }
                     else{
                         ApiResposeCallback(null);
