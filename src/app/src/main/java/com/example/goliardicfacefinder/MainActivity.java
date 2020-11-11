@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             imageUri = Uri.parse(savedInstanceState.getString("cameraImageUri"));
         }
     }
-
+    final LoadingDialog loadingDialog = new LoadingDialog(MainActivity.this);
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -145,13 +145,15 @@ public class MainActivity extends AppCompatActivity {
             imageView1.setImageURI(imageUri);
             System.out.println(imageFile.length());
             apiemela(imageFile);
+            loadingDialog.startLoadingDialog();
         }
     }
     protected void ApiResposeCallback(LinkedList<Face> res){
+        loadingDialog.dismissDialog();
         if (res != null){
 
             Paint pai = new Paint();
-            pai.setColor(Color.argb(125, 0, 64, 255));
+            pai.setColor(Color.argb(100, 0, 64, 255));
 
             BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
             Bitmap bitmap = drawable.getBitmap();
@@ -173,14 +175,14 @@ public class MainActivity extends AppCompatActivity {
     protected List<Rect> GetBounds(Face res){
         Rect top = new Rect(), left = new Rect(), right = new Rect(), bottom = new Rect();
 
-        top.left = res.leftX - 5;
+        top.left = res.leftX + 5;
         top.top = res.topY - 5;
-        top.right = res.rightX + 5;
+        top.right = res.rightX - 5;
         top.bottom = res.topY + 5;
 
-        bottom.left = res.leftX - 5;
+        bottom.left = res.leftX + 5;
         bottom.top = res.bottomY - 5;
-        bottom.right = res.rightX + 5;
+        bottom.right = res.rightX - 5;
         bottom.bottom = res.bottomY + 5;
 
         left.left = res.leftX - 5;
