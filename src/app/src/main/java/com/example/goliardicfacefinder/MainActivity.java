@@ -60,35 +60,10 @@ public class MainActivity extends AppCompatActivity {
     int codeTmp = 0;
     private void checkPermission(String[] PERMISSIONS){
         codeTmp = codeTmp + 1;
-        for (int i = 0; i < PERMISSIONS.length; i++){/*
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, PERMISSIONS[i]) != PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(getApplicationContext(), "You already granted this permission", Toast.LENGTH_LONG).show();
+        for (int i = 0; i < PERMISSIONS.length; i++){
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, PERMISSIONS[i]) == PackageManager.PERMISSION_DENIED){
+                ActivityCompat.requestPermissions(this, new String[]{PERMISSIONS[i]}, codeTmp);
             }
-            else{*/
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, PERMISSIONS[i])){
-                    final int j = i;
-                    new AlertDialog.Builder(this)
-                            .setTitle("Permission needed")
-                            .setMessage("This permission is needed because of this and that")
-                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ActivityCompat.requestPermissions(MainActivity.this,
-                                            new String[] {PERMISSIONS[j]}, codeTmp);
-                                }
-                            })
-                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .create().show();
-                }
-                else{
-                    ActivityCompat.requestPermissions(this, new String[]{PERMISSIONS[i]}, codeTmp);
-                }
-            //}
         }
     }
 
@@ -111,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //WE WE METTI QUA RPOBE DA FARE IL  PERMESSO RUNTIME, ALTRIMENTI CANCELLALO CON LE DIPENDENZE
-        String[] PERMISSIONS = {Manifest.permission.INTERNET};
+        String[] PERMISSIONS = {Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         checkPermission(PERMISSIONS);
 
         setContentView(R.layout.activity_main);
@@ -126,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
                 values.put(MediaStore.Images.Media.DESCRIPTION, "Photo taken on " + System.currentTimeMillis());
                 imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
                 startActivityForResult(intent, IMAGE_PICK_CODE);
