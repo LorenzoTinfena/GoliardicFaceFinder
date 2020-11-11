@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    Uri imageUri;
+    Uri imageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,20 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
                 startActivityForResult(intent, IMAGE_PICK_CODE);
+            }
+        });
+        findViewById(R.id.browserBtnShare).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO quaaaaa fai share
+                ApplicationInfo api = getApplicationContext().getApplicationInfo();
+                 ((ImageView) findViewById(R.id.imageView1)).getDrawable().
+                if (imageUri != null){
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("image/jpeg");
+                    intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                    startActivity(Intent.createChooser(intent, "Share"));
+                }
             }
         });
     }
