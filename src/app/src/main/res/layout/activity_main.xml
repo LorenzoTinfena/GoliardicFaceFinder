@@ -16,24 +16,32 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginLeft="10dp">
             <Button
             android:id="@+id/browserBtn"
             android:layout_width="120dp"
             android:layout_height="60dp"
             android:text="Take photo"
-            app:icon="@drawable/ic_browser"
-            android:layout_marginLeft="10dp">
+            app:icon="@drawable/ic_browser">
             </Button>
 
             <Button
             android:id="@+id/browserBtnShare"
             android:layout_width="120dp"
             android:layout_height="60dp"
-            android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:text="Share"
             app:icon="@drawable/ic_browser_share"></Button>
+
+            <TextView
+                android:id="@+id/errorTxtView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:text="" />
 
     </LinearLayout>
 

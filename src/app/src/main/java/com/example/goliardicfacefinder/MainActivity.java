@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.Manifest;
@@ -30,6 +31,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 //cloudmersive client apis
@@ -46,6 +48,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -103,21 +107,31 @@ public class MainActivity extends AppCompatActivity {
                 imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
+                ((TextView)(findViewById(R.id.errorTxtView))).setText("");
                 startActivityForResult(intent, IMAGE_PICK_CODE);
             }
         });
         findViewById(R.id.browserBtnShare).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO quaaaaa fai share
-                ApplicationInfo api = getApplicationContext().getApplicationInfo();
-                 ((ImageView) findViewById(R.id.imageView1)).getDrawable().
-                if (imageUri != null){
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("image/jpeg");
-                    intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-                    startActivity(Intent.createChooser(intent, "Share"));
+                if (imageUri != null){/*
+                    Drawable drawable = ((ImageView)findViewById(R.id.imageView1)).getDrawable();
+                    Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();*/
+                    try {
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Images.Media.TITLE, "MyPictureEdited");
+                        values.put(MediaStore.Images.Media.DESCRIPTION, "Photo taken on " + System.currentTimeMillis());
+                        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                        FileOutputStream str = new FileOutputStream(new File(FilePath.getPath(MainActivity.this, uri)));
+                        tempBitmap.compress(Bitmap.CompressFormat.JPEG, 100, str);
+
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("image/jpeg");
+                        intent.putExtra(Intent.EXTRA_STREAM, uri);
+                        startActivity(Intent.createChooser(intent, "Share"));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -163,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
             loadingDialog.startLoadingDialog();
         }
     }
+    Bitmap tempBitmap;
     protected void ApiResposeCallback(LinkedList<Face> res){
         loadingDialog.dismissDialog();
         if (res != null){
@@ -172,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
             BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
             Bitmap bitmap = drawable.getBitmap();
-            Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
+            tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
             Canvas tempCanvas = new Canvas(tempBitmap);
             tempCanvas.drawBitmap(bitmap, 0, 0, null);
             for (Face f : res){
@@ -180,10 +195,25 @@ public class MainActivity extends AppCompatActivity {
                     tempCanvas.drawRect(re, pai);
                 }
             }
+            if (res.isEmpty()){
+                tempBitmap = null;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView)(findViewById(R.id.errorTxtView))).setText("no faces found");
+                    }
+                });
+            }
             imageView1.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
         }
         else{
-
+            tempBitmap = null;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ((TextView)(findViewById(R.id.errorTxtView))).setText("Error");
+                }
+            });
         }
     }
 
