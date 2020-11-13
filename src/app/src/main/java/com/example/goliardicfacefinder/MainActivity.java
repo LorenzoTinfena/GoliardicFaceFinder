@@ -183,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
         if (res != null){
 
             Paint pai = new Paint();
-            pai.setColor(Color.argb(100, 0, 64, 255));
+            pai.setColor(Color.argb(255, 60, 105, 240));
+            pai.setTextSize(40);
 
             BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
             Bitmap bitmap = drawable.getBitmap();
@@ -191,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
             Canvas tempCanvas = new Canvas(tempBitmap);
             tempCanvas.drawBitmap(bitmap, 0, 0, null);
             for (Face f : res){
+                tempCanvas.drawText("Age: " + Integer.toString((int)f.Age), (float) f.leftX + 10, (float)(f.topY + 50), pai);
                 for (Rect re : GetBounds(f)){
                     tempCanvas.drawRect(re, pai);
                 }
@@ -220,25 +222,25 @@ public class MainActivity extends AppCompatActivity {
     protected List<Rect> GetBounds(Face res){
         Rect top = new Rect(), left = new Rect(), right = new Rect(), bottom = new Rect();
 
-        top.left = res.leftX + 5;
-        top.top = res.topY - 5;
-        top.right = res.rightX - 5;
-        top.bottom = res.topY + 5;
+        top.left = res.leftX + 4;
+        top.top = res.topY - 4;
+        top.right = res.rightX - 4;
+        top.bottom = res.topY + 4;
 
-        bottom.left = res.leftX + 5;
-        bottom.top = res.bottomY - 5;
-        bottom.right = res.rightX - 5;
-        bottom.bottom = res.bottomY + 5;
+        bottom.left = res.leftX + 4;
+        bottom.top = res.bottomY - 4;
+        bottom.right = res.rightX - 4;
+        bottom.bottom = res.bottomY + 4;
 
-        left.left = res.leftX - 5;
-        left.top = res.topY - 5;
-        left.right = res.leftX + 5;
-        left.bottom = res.bottomY + 5;
+        left.left = res.leftX - 4;
+        left.top = res.topY - 4;
+        left.right = res.leftX + 4;
+        left.bottom = res.bottomY + 4;
 
-        right.left = res.rightX - 5;
-        right.top = res.topY - 5;
-        right.right = res.rightX + 5;
-        right.bottom = res.bottomY + 5;
+        right.left = res.rightX - 4;
+        right.top = res.topY - 4;
+        right.right = res.rightX + 4;
+        right.bottom = res.bottomY + 4;
 
         LinkedList<Rect> li = new LinkedList<Rect>();
         li.add(left);
