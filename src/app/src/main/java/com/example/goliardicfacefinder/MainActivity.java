@@ -58,6 +58,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
 
+import org.json.*;
+
 public class MainActivity extends AppCompatActivity {
 
     ImageView imageView1;
@@ -249,7 +251,21 @@ public class MainActivity extends AppCompatActivity {
         li.add(bottom);
         return li;
     }
-
+    private String fixString(String stringa){
+        stringa = stringa.replace("class AgeDetectionResult", "");
+        stringa = stringa.replace("class AgeDetectionResult", "");
+        while (stringa.contains("class PersonWithAge")){
+            stringa = stringa.replaceAll("class PersonWithAge", "");
+            stringa = stringa.replaceAll("class Face", "");
+        }
+        for (int i = 0; i < stringa.length(); i++){
+            char c = stringa.charAt(i);
+            if (((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) && stringa.charAt(i-1) == ' ' && stringa.substring(i, i+2) != "tr")
+                stringa = stringa.substring(0, i) + "\"" + stringa.substring(i);
+        }
+        stringa = stringa.replaceAll(":", "\":");
+        return stringa;
+    }
     private void apiemela(File imageFile){
         Thread thread = new Thread(){
             public void run(){
@@ -262,6 +278,8 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     //https://api.cloudmersive.com/swagger/index.html?urls.primaryName=Image%20Recognition%20and%20Processing%20API
                     AgeDetectionResult resultAge = apiInstance.faceDetectAge(imageFile);
+
+                                        /*
                     if (resultAge.isSuccessful()){
                         LinkedList<Face> res = new LinkedList<>();
                         for (int i = 0; i < resultAge.getPeopleIdentified(); i++){
@@ -273,10 +291,30 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else{
                         ApiResposeCallback(null);
+                    }*/
+
+                    JSONObject jsonObject = new JSONObject(fixString(resultAge.toString()));
+                    if (jsonObject.getBoolean("Successful"))
+                    {
+                        JSONArray jsonfaces = jsonObject.getJSONArray("PeopleWithAge");
+                        LinkedList<Face> faces = new LinkedList<Face>();
+                        for (int i = 0; i < jsonfaces.length(); i++){
+                            JSONObject face = jsonfaces.getJSONObject(i);
+                            JSONObject faceLocation = face.getJSONObject("FaceLocation");
+                            faces.add(new Face(faceLocation.getInt("LeftX"), faceLocation.getInt("TopY"), faceLocation.getInt("RightX"), faceLocation.getInt("BottomY"),
+                                    face.getString("AgeClass"), face.getDouble("Age"), face.getDouble("AgeClassificationConfidence")));
+                        }
+                        ApiResposeCallback(faces);
                     }
+                    else{
+                        ApiResposeCallback(null);
+                    }
+
+
+
                     System.out.println("____________________________________");
                     System.out.println(resultAge);
-                } catch (ApiException e) {
+                } catch (ApiException | JSONException e) {
                     ApiResposeCallback(null);
                     System.err.println("____________________________________");
                     System.err.println(e.toString());
