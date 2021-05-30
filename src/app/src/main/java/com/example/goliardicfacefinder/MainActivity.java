@@ -208,7 +208,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-            imageView1.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    imageView1.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+                }
+            });
         }
         else{
             tempBitmap = null;
@@ -251,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         li.add(bottom);
         return li;
     }
-    private String fixString(String stringa){
+    /*private String fixString(String stringa){
         stringa = stringa.replace("class AgeDetectionResult", "");
         stringa = stringa.replace("class AgeDetectionResult", "");
         while (stringa.contains("class PersonWithAge")){
@@ -265,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         }
         stringa = stringa.replaceAll(":", "\":");
         return stringa;
-    }
+    }*/
     private void apiemela(File imageFile){
         Thread thread = new Thread(){
             public void run(){
@@ -279,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
                     //https://api.cloudmersive.com/swagger/index.html?urls.primaryName=Image%20Recognition%20and%20Processing%20API
                     AgeDetectionResult resultAge = apiInstance.faceDetectAge(imageFile);
 
-                                        /*
+
                     if (resultAge.isSuccessful()){
                         LinkedList<Face> res = new LinkedList<>();
                         for (int i = 0; i < resultAge.getPeopleIdentified(); i++){
@@ -291,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else{
                         ApiResposeCallback(null);
-                    }*/
-
+                    }
+                    /*
                     JSONObject jsonObject = new JSONObject(fixString(resultAge.toString()));
                     if (jsonObject.getBoolean("Successful"))
                     {
@@ -308,13 +313,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else{
                         ApiResposeCallback(null);
-                    }
+                    }*/
 
 
 
                     System.out.println("____________________________________");
                     System.out.println(resultAge);
-                } catch (ApiException | JSONException e) {
+                } catch (ApiException e) {
                     ApiResposeCallback(null);
                     System.err.println("____________________________________");
                     System.err.println(e.toString());
